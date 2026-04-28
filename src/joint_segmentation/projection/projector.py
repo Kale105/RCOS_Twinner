@@ -11,6 +11,8 @@ class ProjectionResult:
 
     point_indices: np.ndarray
     class_scores: np.ndarray
+    uv: np.ndarray | None = None
+    valid_mask: np.ndarray | None = None
 
 
 class ImageToPointProjector:
@@ -18,4 +20,3 @@ class ImageToPointProjector:
 
     def project(self, points: np.ndarray, image_scores: np.ndarray) -> ProjectionResult:
         raise NotImplementedError("Projection logic will be added after calibration format is chosen.")
-

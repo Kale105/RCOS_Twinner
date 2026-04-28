@@ -36,3 +36,16 @@ pip install -e ".[dev]"
 pytest
 ```
 
+## iPhone LiDAR Projection
+
+The first projection script maps image-space labels back onto a LiDAR point cloud:
+
+```bash
+python scripts/project_iphone_lidar.py \
+  --points data/raw/pointclouds/scan.npy \
+  --labels data/raw/labels/frame_labels.npy \
+  --calibration data/raw/calibration/frame_calibration.json \
+  --output outputs/projections/scan_projected_labels.npz
+```
+
+Supported point inputs are `.npy`, `.npz`, `.csv`, and ASCII `.ply`. Calibration JSON should include a 3x3 `intrinsics` matrix and may include a 4x4 `camera_from_lidar` matrix. If `camera_from_lidar` is missing, points are treated as already being in the camera coordinate frame.
