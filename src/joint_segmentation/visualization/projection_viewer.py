@@ -67,7 +67,7 @@ def render_projection_plot(
     output: str | Path | None = None,
     max_points: int | None = 100_000,
     point_size: float = 1.0,
-    title: str = "Projected iPhone LiDAR Labels",
+    title: str = "Projected Point Cloud Labels",
     show: bool = False,
 ) -> None:
     """Render a 3D scatter plot of projected labels."""

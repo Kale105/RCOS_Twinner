@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", help="Optional PNG path. If omitted, opens an interactive window.")
     parser.add_argument("--max-points", type=int, default=100_000, help="Maximum points to plot.")
     parser.add_argument("--point-size", type=float, default=1.0, help="Scatter point size.")
-    parser.add_argument("--title", default="Projected iPhone LiDAR Labels", help="Plot title.")
+    parser.add_argument("--title", default="Projected Point Cloud Labels", help="Plot title.")
     return parser.parse_args()
 
 
@@ -43,4 +43,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

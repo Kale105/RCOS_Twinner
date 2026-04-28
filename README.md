@@ -62,13 +62,23 @@ python scripts/project_relative_photo.py \
 
 You can also provide `--camera data/raw/calibration/photo_camera.json` with either `intrinsics` or `fov_degrees`, plus an optional 4x4 `camera_from_world` transform.
 
-To visualize the projected point cloud:
+To visualize either iPhone LiDAR or regular-photo projection output:
 
 ```bash
 python scripts/visualize_projection.py \
   --points data/raw/pointclouds/scan.npy \
   --projection outputs/projections/scan_projected_labels.npz \
   --output outputs/projections/scan_projected_labels.png
+```
+
+For the relative-photo projection, pass the `.npz` from `project_relative_photo.py`:
+
+```bash
+python scripts/visualize_projection.py \
+  --points data/raw/pointclouds/scan.npy \
+  --projection outputs/projections/photo_projected_labels.npz \
+  --output outputs/projections/photo_projected_labels.png \
+  --title "Projected Photo Labels"
 ```
 
 Omit `--output` to open an interactive Matplotlib window.
