@@ -153,6 +153,8 @@ def save_projection(path: str | Path, result: ProjectionResult, point_count: int
     assigned_labels = np.full((point_count,), -1, dtype=int)
     if result.class_scores.ndim == 1:
         assigned_labels[result.point_indices] = result.class_scores.astype(int)
+    elif result.class_scores.ndim == 2:
+        assigned_labels[result.point_indices] = np.argmax(result.class_scores, axis=1).astype(int)
 
     np.savez_compressed(
         path,

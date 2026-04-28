@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
   "numpy>=1.24",
+  "matplotlib>=3.7",
   "pyyaml>=6.0",
 ]
 
@@ -23,6 +24,7 @@ dev = [
 joint-seg-train = "joint_segmentation.cli.train:main"
 joint-seg-infer = "joint_segmentation.cli.infer:main"
 joint-seg-project-iphone = "joint_segmentation.cli.project_iphone_lidar:main"
+joint-seg-visualize-projection = "joint_segmentation.cli.visualize_projection:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

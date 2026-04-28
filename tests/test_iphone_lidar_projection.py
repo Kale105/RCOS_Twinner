@@ -6,6 +6,7 @@ from joint_segmentation.projection.iphone_lidar import (
     CameraCalibration,
     load_points,
     project_lidar_labels,
+    save_projection,
 )
 
 
@@ -56,3 +57,20 @@ def test_calibration_loads_optional_transform(tmp_path) -> None:
 
     np.testing.assert_allclose(calibration.camera_from_lidar, np.eye(4))
 
+
+def test_save_projection_assigns_argmax_for_score_tensors(tmp_path) -> None:
+    projection_path = tmp_path / "projection.npz"
+    calibration = CameraCalibration(
+        intrinsics=np.array([[1.0, 0.0, 1.0], [0.0, 1.0, 1.0], [0.0, 0.0, 1.0]]),
+        camera_from_lidar=np.eye(4),
+    )
+    result = project_lidar_labels(
+        np.array([[0.0, 0.0, 1.0]]),
+        np.array([[[0.1, 0.9], [0.8, 0.2]], [[0.3, 0.7], [0.4, 0.6]]]),
+        calibration,
+    )
+
+    save_projection(projection_path, result, point_count=1)
+
+    saved = np.load(projection_path)
+    np.testing.assert_array_equal(saved["assigned_labels"], np.array([1]))

@@ -49,3 +49,14 @@ python scripts/project_iphone_lidar.py \
 ```
 
 Supported point inputs are `.npy`, `.npz`, `.csv`, and ASCII `.ply`. Calibration JSON should include a 3x3 `intrinsics` matrix and may include a 4x4 `camera_from_lidar` matrix. If `camera_from_lidar` is missing, points are treated as already being in the camera coordinate frame.
+
+To visualize the projected point cloud:
+
+```bash
+python scripts/visualize_projection.py \
+  --points data/raw/pointclouds/scan.npy \
+  --projection outputs/projections/scan_projected_labels.npz \
+  --output outputs/projections/scan_projected_labels.png
+```
+
+Omit `--output` to open an interactive Matplotlib window.
