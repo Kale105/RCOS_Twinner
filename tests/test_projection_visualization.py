@@ -4,6 +4,7 @@ from joint_segmentation.visualization.projection_viewer import (
     label_color_values,
     load_projection_labels,
     prepare_visualization_data,
+    render_projection_comparison,
 )
 
 
@@ -37,3 +38,13 @@ def test_prepare_visualization_data_downsamples_evenly() -> None:
     assert data.points.shape == (4, 3)
     np.testing.assert_array_equal(data.labels, np.array([0, 3, 6, 9]))
 
+
+def test_render_projection_comparison_writes_png(tmp_path) -> None:
+    output_path = tmp_path / "comparison.png"
+    points = np.array([[0.0, 0.0, 1.0], [1.0, 0.0, 1.0], [0.0, 1.0, 2.0]])
+    labels = np.array([-1, 2, 3])
+
+    render_projection_comparison(points, labels, output=output_path, max_points=None)
+
+    assert output_path.exists()
+    assert output_path.stat().st_size > 0

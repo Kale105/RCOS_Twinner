@@ -112,6 +112,70 @@ def render_projection_plot(
     plt.close(fig)
 
 
+def render_projection_comparison(
+    points: np.ndarray,
+    labels: np.ndarray,
+    output: str | Path | None = None,
+    max_points: int | None = 100_000,
+    point_size: float = 1.0,
+    title: str = "Point Cloud Projection Comparison",
+    show: bool = False,
+) -> None:
+    """Render original geometry beside projected labels."""
+    _configure_matplotlib_cache()
+
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import ListedColormap
+
+    data = prepare_visualization_data(points, labels, max_points=max_points)
+    color_values, tick_values, tick_labels = label_color_values(data.labels)
+    depth_values = data.points[:, 2]
+
+    fig = plt.figure(figsize=(16, 8))
+    original_ax = fig.add_subplot(121, projection="3d")
+    projected_ax = fig.add_subplot(122, projection="3d")
+    fig.suptitle(title)
+
+    original_scatter = original_ax.scatter(
+        data.points[:, 0],
+        data.points[:, 1],
+        data.points[:, 2],
+        c=depth_values,
+        cmap="viridis",
+        s=point_size,
+        linewidths=0,
+    )
+    projected_scatter = projected_ax.scatter(
+        data.points[:, 0],
+        data.points[:, 1],
+        data.points[:, 2],
+        c=color_values,
+        cmap=ListedColormap(_label_palette(len(tick_values))),
+        s=point_size,
+        linewidths=0,
+    )
+
+    _format_point_axis(original_ax, data.points, "Original point cloud")
+    _format_point_axis(projected_ax, data.points, "Projected labels")
+
+    depth_colorbar = fig.colorbar(original_scatter, ax=original_ax, fraction=0.03, pad=0.08)
+    depth_colorbar.set_label("Z depth")
+
+    label_colorbar = fig.colorbar(projected_scatter, ax=projected_ax, fraction=0.03, pad=0.08)
+    label_colorbar.set_ticks(tick_values)
+    label_colorbar.set_ticklabels(tick_labels)
+    label_colorbar.set_label("Projected label")
+    fig.tight_layout()
+
+    if output is not None:
+        output_path = Path(output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(output_path, dpi=180)
+    if show:
+        plt.show()
+    plt.close(fig)
+
+
 def label_color_values(labels: np.ndarray) -> tuple[np.ndarray, list[int], list[str]]:
     """Map raw labels into compact color ids for plotting."""
     unique_labels = sorted(int(label) for label in np.unique(labels))
@@ -144,6 +208,14 @@ def _axis_aspect(points: np.ndarray) -> tuple[float, float, float]:
     ranges = np.ptp(points, axis=0)
     ranges = np.where(ranges == 0, 1.0, ranges)
     return tuple(float(value) for value in ranges)
+
+
+def _format_point_axis(ax, points: np.ndarray, title: str) -> None:
+    ax.set_title(title)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+    ax.set_box_aspect(_axis_aspect(points))
 
 
 def _configure_matplotlib_cache() -> None:

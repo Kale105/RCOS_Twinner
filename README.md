@@ -82,3 +82,12 @@ python scripts/visualize_projection.py \
 ```
 
 Omit `--output` to open an interactive Matplotlib window.
+
+To compare the original point cloud with projected labels side by side:
+
+```bash
+python scripts/compare_projection.py \
+  --points data/raw/pointclouds/scan.npy \
+  --projection outputs/projections/photo_projected_labels.npz \
+  --output outputs/projections/photo_projection_comparison.png
+```
