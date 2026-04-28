@@ -1,0 +1,20 @@
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Data and generated artifacts
+data/raw/
+data/processed/
+data/external/
+outputs/
+checkpoints/
+runs/
+wandb/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+

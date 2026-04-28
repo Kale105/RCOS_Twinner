@@ -1,0 +1,32 @@
+project:
+  name: joint-pointcloud-segmentation
+  seed: 42
+
+data:
+  point_cloud_dir: data/raw/pointclouds
+  image_dir: data/raw/images
+  calibration_dir: data/raw/calibration
+  labels_dir: data/raw/labels
+
+model:
+  point_segmenter:
+    name: placeholder-point-segmenter
+    checkpoint: null
+  image_projector:
+    name: placeholder-image-projector
+    checkpoint: null
+  fusion:
+    strategy: weighted_vote
+    point_weight: 0.5
+    image_weight: 0.5
+
+training:
+  batch_size: 1
+  epochs: 1
+  learning_rate: 0.001
+
+evaluation:
+  metrics:
+    - mean_iou
+    - point_accuracy
+
