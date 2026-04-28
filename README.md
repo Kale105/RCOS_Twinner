@@ -50,6 +50,18 @@ python scripts/project_iphone_lidar.py \
 
 Supported point inputs are `.npy`, `.npz`, `.csv`, and ASCII `.ply`. Calibration JSON should include a 3x3 `intrinsics` matrix and may include a 4x4 `camera_from_lidar` matrix. If `camera_from_lidar` is missing, points are treated as already being in the camera coordinate frame.
 
+For a regular photo without iPhone LiDAR calibration, use the relative projection script. It assumes points are already camera-relative unless a `camera_from_world` transform is provided:
+
+```bash
+python scripts/project_relative_photo.py \
+  --points data/raw/pointclouds/scan.npy \
+  --labels data/raw/labels/photo_labels.npy \
+  --fov-degrees 60 \
+  --output outputs/projections/photo_projected_labels.npz
+```
+
+You can also provide `--camera data/raw/calibration/photo_camera.json` with either `intrinsics` or `fov_degrees`, plus an optional 4x4 `camera_from_world` transform.
+
 To visualize the projected point cloud:
 
 ```bash
