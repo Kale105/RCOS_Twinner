@@ -101,3 +101,25 @@ python scripts/classify_projected_pointcloud.py \
   --output outputs/classifications/scan_classes.npz \
   --summary outputs/classifications/scan_summary.json
 ```
+
+## Point Model Inference
+
+The first point-model backend is Open3D-ML RandLA-Net. RandLA-Net is a lightweight semantic segmentation architecture for large-scale point clouds that uses random sampling and local feature aggregation.
+
+Install optional model dependencies before running this path:
+
+```bash
+pip install -e ".[models]"
+```
+
+Then run inference with a RandLA-Net checkpoint:
+
+```bash
+python scripts/run_point_model_inference.py \
+  --points data/raw/pointclouds/scan.npy \
+  --checkpoint checkpoints/randlanet.ckpt \
+  --num-classes 19 \
+  --output outputs/model_predictions/scan_randlanet.npz
+```
+
+The output includes `assigned_labels`, so it can be passed directly to `visualize_projection.py` or `compare_projection.py`.
