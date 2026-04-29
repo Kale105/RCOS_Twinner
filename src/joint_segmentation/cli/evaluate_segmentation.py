@@ -10,6 +10,7 @@ from joint_segmentation.evaluation.segmentation_metrics import (
     print_evaluation_report,
     save_evaluation_report,
 )
+from joint_segmentation.labels import load_label_map
 
 
 def parse_args() -> argparse.Namespace:
@@ -19,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", help="Optional JSON report path.")
     parser.add_argument("--point-count", type=int, help="Required for sparse .npz prediction inputs.")
     parser.add_argument("--ignore-label", type=int, default=-1, help="Ground-truth label to ignore.")
+    parser.add_argument("--label-map", help="Optional YAML label map for class names in reports.")
     parser.add_argument(
         "--classes",
         nargs="*",
@@ -32,11 +34,13 @@ def main() -> None:
     args = parse_args()
     predicted = load_labels(args.prediction, point_count=args.point_count)
     ground_truth = load_labels(args.ground_truth, point_count=len(predicted))
+    label_map = load_label_map(args.label_map)
     evaluation = evaluate_segmentation(
         predicted,
         ground_truth,
         ignore_label=args.ignore_label,
         class_labels=args.classes,
+        label_map=label_map,
     )
 
     print_evaluation_report(evaluation)
@@ -47,4 +51,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

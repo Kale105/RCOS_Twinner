@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 
 from joint_segmentation.projection.iphone_lidar import load_points
+from joint_segmentation.labels import load_label_map
 from joint_segmentation.visualization.projection_viewer import (
     load_projection_labels,
     render_projection_plot,
@@ -19,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-points", type=int, default=100_000, help="Maximum points to plot.")
     parser.add_argument("--point-size", type=float, default=1.0, help="Scatter point size.")
     parser.add_argument("--title", default="Projected Point Cloud Labels", help="Plot title.")
+    parser.add_argument("--label-map", help="Optional YAML label map for legend names/colors.")
     return parser.parse_args()
 
 
@@ -26,6 +28,7 @@ def main() -> None:
     args = parse_args()
     points = load_points(args.points)
     labels = load_projection_labels(args.projection, point_count=len(points))
+    label_map = load_label_map(args.label_map)
 
     render_projection_plot(
         points,
@@ -35,6 +38,7 @@ def main() -> None:
         point_size=args.point_size,
         title=args.title,
         show=args.output is None,
+        label_map=label_map,
     )
 
     if args.output:

@@ -9,6 +9,8 @@ from pathlib import Path
 
 import numpy as np
 
+from joint_segmentation.labels import LabelMap
+
 
 @dataclass(frozen=True)
 class ProjectionVisualizationData:
@@ -69,6 +71,7 @@ def render_projection_plot(
     point_size: float = 1.0,
     title: str = "Projected Point Cloud Labels",
     show: bool = False,
+    label_map: LabelMap | None = None,
 ) -> None:
     """Render a 3D scatter plot of projected labels."""
     _configure_matplotlib_cache()
@@ -77,7 +80,7 @@ def render_projection_plot(
     from matplotlib.colors import ListedColormap
 
     data = prepare_visualization_data(points, labels, max_points=max_points)
-    color_values, tick_values, tick_labels = label_color_values(data.labels)
+    color_values, tick_values, tick_labels = label_color_values(data.labels, label_map=label_map)
 
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
@@ -86,7 +89,7 @@ def render_projection_plot(
         data.points[:, 1],
         data.points[:, 2],
         c=color_values,
-        cmap=ListedColormap(_label_palette(len(tick_values))),
+        cmap=ListedColormap(_label_palette_for_labels(data.labels, label_map)),
         s=point_size,
         linewidths=0,
     )
@@ -120,6 +123,7 @@ def render_projection_comparison(
     point_size: float = 1.0,
     title: str = "Point Cloud Projection Comparison",
     show: bool = False,
+    label_map: LabelMap | None = None,
 ) -> None:
     """Render original geometry beside projected labels."""
     _configure_matplotlib_cache()
@@ -128,7 +132,7 @@ def render_projection_comparison(
     from matplotlib.colors import ListedColormap
 
     data = prepare_visualization_data(points, labels, max_points=max_points)
-    color_values, tick_values, tick_labels = label_color_values(data.labels)
+    color_values, tick_values, tick_labels = label_color_values(data.labels, label_map=label_map)
     depth_values = data.points[:, 2]
 
     fig = plt.figure(figsize=(16, 8))
@@ -150,7 +154,7 @@ def render_projection_comparison(
         data.points[:, 1],
         data.points[:, 2],
         c=color_values,
-        cmap=ListedColormap(_label_palette(len(tick_values))),
+        cmap=ListedColormap(_label_palette_for_labels(data.labels, label_map)),
         s=point_size,
         linewidths=0,
     )
@@ -176,13 +180,19 @@ def render_projection_comparison(
     plt.close(fig)
 
 
-def label_color_values(labels: np.ndarray) -> tuple[np.ndarray, list[int], list[str]]:
+def label_color_values(
+    labels: np.ndarray,
+    label_map: LabelMap | None = None,
+) -> tuple[np.ndarray, list[int], list[str]]:
     """Map raw labels into compact color ids for plotting."""
     unique_labels = sorted(int(label) for label in np.unique(labels))
     label_to_color = {label: index for index, label in enumerate(unique_labels)}
     color_values = np.array([label_to_color[int(label)] for label in labels], dtype=int)
     tick_values = list(range(len(unique_labels)))
-    tick_labels = ["unprojected" if label == -1 else str(label) for label in unique_labels]
+    if label_map is None:
+        tick_labels = ["unprojected" if label == -1 else str(label) for label in unique_labels]
+    else:
+        tick_labels = [label_map.display_name(label) for label in unique_labels]
     return color_values, tick_values, tick_labels
 
 
@@ -202,6 +212,14 @@ def _label_palette(size: int) -> list[str]:
     if size <= len(base):
         return base[:size]
     return [base[index % len(base)] for index in range(size)]
+
+
+def _label_palette_for_labels(labels: np.ndarray, label_map: LabelMap | None) -> list[str]:
+    unique_labels = sorted(int(label) for label in np.unique(labels))
+    if label_map is None:
+        return _label_palette(len(unique_labels))
+    fallback = _label_palette(len(unique_labels))
+    return [label_map.color(label) or fallback[index] for index, label in enumerate(unique_labels)]
 
 
 def _axis_aspect(points: np.ndarray) -> tuple[float, float, float]:

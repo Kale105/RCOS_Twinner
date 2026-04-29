@@ -6,6 +6,7 @@ from joint_segmentation.visualization.projection_viewer import (
     prepare_visualization_data,
     render_projection_comparison,
 )
+from joint_segmentation.labels import LabelInfo, LabelMap
 
 
 def test_label_color_values_names_unprojected_points() -> None:
@@ -14,6 +15,14 @@ def test_label_color_values_names_unprojected_points() -> None:
     np.testing.assert_array_equal(color_values, np.array([0, 1, 1, 2]))
     assert tick_values == [0, 1, 2]
     assert tick_labels == ["unprojected", "2", "5"]
+
+
+def test_label_color_values_uses_label_map_names() -> None:
+    label_map = LabelMap({2: LabelInfo(id=2, name="road", color="#7f7f7f")})
+
+    _, _, tick_labels = label_color_values(np.array([-1, 2]), label_map=label_map)
+
+    assert tick_labels == ["unprojected", "2: road"]
 
 
 def test_load_projection_labels_from_scores(tmp_path) -> None:

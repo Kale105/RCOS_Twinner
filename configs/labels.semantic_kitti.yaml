@@ -1,0 +1,64 @@
+labels:
+  -1:
+    name: unprojected
+    color: "#8a8f98"
+  0:
+    name: unlabeled
+    color: "#000000"
+  1:
+    name: car
+    color: "#2457ff"
+  2:
+    name: bicycle
+    color: "#ff7f0e"
+  3:
+    name: motorcycle
+    color: "#d62728"
+  4:
+    name: truck
+    color: "#8c564b"
+  5:
+    name: other-vehicle
+    color: "#9467bd"
+  6:
+    name: person
+    color: "#e377c2"
+  7:
+    name: bicyclist
+    color: "#17becf"
+  8:
+    name: motorcyclist
+    color: "#bcbd22"
+  9:
+    name: road
+    color: "#7f7f7f"
+  10:
+    name: parking
+    color: "#c7c7c7"
+  11:
+    name: sidewalk
+    color: "#2ca02c"
+  12:
+    name: other-ground
+    color: "#98df8a"
+  13:
+    name: building
+    color: "#ff9896"
+  14:
+    name: fence
+    color: "#c49c94"
+  15:
+    name: vegetation
+    color: "#1b9e77"
+  16:
+    name: trunk
+    color: "#a6761d"
+  17:
+    name: terrain
+    color: "#66a61e"
+  18:
+    name: pole
+    color: "#7570b3"
+  19:
+    name: traffic-sign
+    color: "#e6ab02"

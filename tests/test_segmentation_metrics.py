@@ -7,6 +7,7 @@ from joint_segmentation.evaluation.segmentation_metrics import (
     load_labels,
     save_evaluation_report,
 )
+from joint_segmentation.labels import LabelInfo, LabelMap
 
 
 def test_evaluate_segmentation_computes_accuracy_and_iou() -> None:
@@ -50,3 +51,11 @@ def test_save_evaluation_report(tmp_path) -> None:
     assert report["accuracy"] == 0.5
     assert report["class_metrics"][0]["label"] == 1
 
+
+def test_evaluate_segmentation_includes_label_names() -> None:
+    label_map = LabelMap({1: LabelInfo(id=1, name="car", color="#2457ff")})
+
+    evaluation = evaluate_segmentation(np.array([1]), np.array([1]), label_map=label_map)
+
+    assert evaluation.class_metrics[0].name == "car"
+    assert evaluation.label_map["1"]["name"] == "car"

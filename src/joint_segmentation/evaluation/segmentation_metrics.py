@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from joint_segmentation.fusion.joint_segmentation import load_prediction_inputs
+from joint_segmentation.labels import LabelMap, label_map_to_jsonable
 
 
 @dataclass(frozen=True)
@@ -16,6 +17,7 @@ class ClassMetric:
     """Per-class segmentation metrics."""
 
     label: int
+    name: str | None
     true_positive: int
     false_positive: int
     false_negative: int
@@ -36,6 +38,7 @@ class SegmentationEvaluation:
     accuracy: float | None
     mean_iou: float | None
     class_metrics: list[ClassMetric]
+    label_map: dict | None = None
 
 
 def load_labels(path: str | Path, point_count: int | None = None, preferred_key: str | None = None) -> np.ndarray:
@@ -65,6 +68,7 @@ def evaluate_segmentation(
     ground_truth_labels: np.ndarray,
     ignore_label: int = -1,
     class_labels: list[int] | None = None,
+    label_map: LabelMap | None = None,
 ) -> SegmentationEvaluation:
     """Evaluate per-point segmentation labels against ground truth."""
     predicted = np.asarray(predicted_labels, dtype=int).reshape((-1,))
@@ -90,7 +94,7 @@ def evaluate_segmentation(
         accuracy = float((predicted[valid] == ground_truth[valid]).sum() / evaluated_count)
 
     class_metrics = [
-        _class_metric(label, predicted=predicted, ground_truth=ground_truth, valid=valid)
+        _class_metric(label, predicted=predicted, ground_truth=ground_truth, valid=valid, label_map=label_map)
         for label in class_values
     ]
     ious = [metric.iou for metric in class_metrics if metric.iou is not None]
@@ -103,6 +107,7 @@ def evaluate_segmentation(
         accuracy=accuracy,
         mean_iou=mean_iou,
         class_metrics=class_metrics,
+        label_map=label_map_to_jsonable(label_map),
     )
 
 
@@ -128,6 +133,7 @@ def _class_metric(
     predicted: np.ndarray,
     ground_truth: np.ndarray,
     valid: np.ndarray,
+    label_map: LabelMap | None = None,
 ) -> ClassMetric:
     pred_is_label = (predicted == label) & valid
     truth_is_label = (ground_truth == label) & valid
@@ -144,6 +150,7 @@ def _class_metric(
 
     return ClassMetric(
         label=label,
+        name=None if label_map is None else label_map.name(label),
         true_positive=true_positive,
         false_positive=false_positive,
         false_negative=false_negative,
@@ -167,4 +174,3 @@ def _infer_point_count_from_npz(path: Path, preferred_key: str | None) -> int:
 
 def _format_optional(value: float | None) -> str:
     return "n/a" if value is None else f"{value:.4f}"
-

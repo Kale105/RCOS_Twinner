@@ -155,6 +155,18 @@ python scripts/evaluate_segmentation.py \
 
 The evaluator reports point accuracy, mean IoU, and per-class IoU/precision/recall. It works with projection, point-model, or fused joint `.npz` outputs.
 
+Use a label map to show class names and consistent colors:
+
+```bash
+python scripts/evaluate_segmentation.py \
+  --prediction outputs/joint/scan_joint_labels.npz \
+  --ground-truth data/raw/labels/scan_point_labels.npy \
+  --label-map configs/labels.semantic_kitti.yaml \
+  --output outputs/joint/scan_joint_eval.json
+```
+
+Visualization scripts also accept `--label-map configs/labels.semantic_kitti.yaml`.
+
 ## End-to-End Pipeline
 
 Run projection, point-model inference, fusion, optional evaluation, and optional visualization from one config:
