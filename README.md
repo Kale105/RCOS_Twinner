@@ -91,3 +91,13 @@ python scripts/compare_projection.py \
   --projection outputs/projections/photo_projected_labels.npz \
   --output outputs/projections/photo_projection_comparison.png
 ```
+
+To classify a point cloud using the projected image labels:
+
+```bash
+python scripts/classify_projected_pointcloud.py \
+  --points data/raw/pointclouds/scan.npy \
+  --projection outputs/projections/photo_projected_labels.npz \
+  --output outputs/classifications/scan_classes.npz \
+  --summary outputs/classifications/scan_summary.json
+```
