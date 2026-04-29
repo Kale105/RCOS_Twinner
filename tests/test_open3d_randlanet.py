@@ -3,6 +3,7 @@ import numpy as np
 from joint_segmentation.models.open3d_randlanet import (
     Open3DRandLANetSegmenter,
     PointModelPrediction,
+    configure_open3d_runtime,
     extract_open3d_predictions,
     save_point_model_prediction,
 )
@@ -31,11 +32,25 @@ def test_open3d_randlanet_segmenter_uses_injected_pipeline() -> None:
     pipeline = FakePipeline({"predict_labels": np.array([2, 3])})
     segmenter = Open3DRandLANetSegmenter(pipeline=pipeline)
 
-    prediction = segmenter.predict(np.array([[0.0, 0.0, 1.0], [1.0, 0.0, 1.0]]))
+    points = np.tile(np.array([[0.0, 0.0, 1.0], [1.0, 0.0, 1.0]]), (512, 1))
+    pipeline.results = {"predict_labels": np.arange(len(points)) % 4}
 
-    np.testing.assert_array_equal(prediction.labels, np.array([2, 3]))
-    assert pipeline.last_data["point"].shape == (2, 3)
-    assert pipeline.last_data["feat"].shape == (2, 3)
+    prediction = segmenter.predict(points)
+
+    np.testing.assert_array_equal(prediction.labels, np.arange(len(points)) % 4)
+    assert pipeline.last_data["point"].shape == (1024, 3)
+    assert pipeline.last_data["feat"] is None
+
+
+def test_open3d_randlanet_segmenter_rejects_tiny_clouds() -> None:
+    segmenter = Open3DRandLANetSegmenter(pipeline=FakePipeline({"predict_labels": np.array([])}))
+
+    try:
+        segmenter.predict(np.zeros((12, 3)))
+    except ValueError as exc:
+        assert "at least 1024" in str(exc)
+    else:
+        raise AssertionError("Expected tiny point clouds to be rejected.")
 
 
 def test_save_point_model_prediction_is_visualizer_compatible(tmp_path) -> None:
@@ -51,3 +66,14 @@ def test_save_point_model_prediction_is_visualizer_compatible(tmp_path) -> None:
     np.testing.assert_array_equal(saved["assigned_labels"], np.array([1, 2]))
     np.testing.assert_allclose(saved["class_scores"], prediction.scores)
 
+
+def test_configure_open3d_runtime_sets_writable_cache_dirs(monkeypatch) -> None:
+    monkeypatch.delenv("MPLCONFIGDIR", raising=False)
+    monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
+
+    configure_open3d_runtime()
+
+    assert "joint_segmentation_open3d" in __import__("os").environ["MPLCONFIGDIR"]
+    assert "joint_segmentation_open3d" in __import__("os").environ["XDG_CACHE_HOME"]
+    assert __import__("os").environ["KMP_DUPLICATE_LIB_OK"] == "TRUE"
+    assert __import__("os").environ["OMP_NUM_THREADS"] == "1"

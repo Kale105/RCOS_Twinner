@@ -6,11 +6,19 @@ runtime dependencies. Import errors are raised only when this adapter is used.
 
 from __future__ import annotations
 
+import os
+import tempfile
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+SEMANTIC_KITTI_RANDLANET_URL = (
+    "https://storage.googleapis.com/open3d-releases/model-zoo/"
+    "randlanet_semantickitti_202201071330utc.pth"
+)
 
 
 @dataclass(frozen=True)
@@ -45,10 +53,15 @@ class Open3DRandLANetSegmenter:
         points = np.asarray(points, dtype=np.float32)
         if points.ndim != 2 or points.shape[1] != 3:
             raise ValueError("RandLA-Net inference expects points shaped N x 3.")
+        if len(points) < 1024:
+            raise ValueError(
+                "RandLA-Net inference needs at least 1024 input points for its "
+                "multi-layer neighbor sampling. Use a larger scan or a simpler baseline."
+            )
 
         data = {
             "point": points,
-            "feat": points,
+            "feat": None,
             "label": np.zeros((len(points),), dtype=np.int32),
         }
         results = self.pipeline.run_inference(data)
@@ -59,6 +72,7 @@ class Open3DRandLANetSegmenter:
         if self.backend != "torch":
             raise ValueError("Only the Open3D-ML Torch backend is wired for this adapter.")
 
+        configure_open3d_runtime()
         try:
             from open3d.ml.torch.models import RandLANet
             from open3d.ml.torch.pipelines import SemanticSegmentation
@@ -83,6 +97,53 @@ class Open3DRandLANetSegmenter:
         if self.checkpoint:
             pipeline.load_ckpt(self.checkpoint)
         return pipeline
+
+
+def check_open3d_randlanet_dependencies() -> dict[str, str]:
+    """Import the Open3D-ML RandLA-Net stack and return installed versions."""
+    configure_open3d_runtime()
+
+    import dash
+    import open3d
+    import tensorboard
+    import torch
+    import torchvision
+    from open3d.ml.torch.models import RandLANet
+    from open3d.ml.torch.pipelines import SemanticSegmentation
+
+    # Keep imported symbols referenced so static checkers do not treat this as dead code.
+    _ = (RandLANet, SemanticSegmentation)
+    return {
+        "dash": dash.__version__,
+        "open3d": open3d.__version__,
+        "tensorboard": tensorboard.__version__,
+        "torch": torch.__version__,
+        "torchvision": torchvision.__version__,
+    }
+
+
+def download_semantic_kitti_checkpoint(
+    output_path: str | Path,
+    url: str = SEMANTIC_KITTI_RANDLANET_URL,
+) -> Path:
+    """Download the Open3D model-zoo RandLA-Net SemanticKITTI checkpoint."""
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    if output_path.exists():
+        return output_path
+
+    urllib.request.urlretrieve(url, output_path)
+    return output_path
+
+
+def configure_open3d_runtime() -> None:
+    """Set writable cache directories before Open3D imports visualization modules."""
+    cache_root = Path(tempfile.gettempdir()) / "joint_segmentation_open3d"
+    cache_root.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault("MPLCONFIGDIR", str(cache_root / "mplconfig"))
+    os.environ.setdefault("XDG_CACHE_HOME", str(cache_root / "xdg"))
+    os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
+    os.environ.setdefault("OMP_NUM_THREADS", "1")
 
 
 def extract_open3d_predictions(results: Any) -> tuple[np.ndarray, np.ndarray | None]:

@@ -20,8 +20,11 @@ dev = [
   "ruff>=0.4",
 ]
 models = [
-  "open3d>=0.18",
-  "torch>=2.0",
+  "dash>=2.6,<3",
+  "open3d==0.19.*",
+  "tensorboard>=2.14",
+  "torch>=2.2,<2.3",
+  "torchvision>=0.17,<0.18",
 ]
 
 [project.scripts]

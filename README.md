@@ -112,6 +112,8 @@ Install optional model dependencies before running this path:
 pip install -e ".[models]"
 ```
 
+The model extra pins the compatible Open3D-ML stack used by this project: Open3D `0.19.*`, Torch `2.2.*`, TorchVision `0.17.*`, Dash `2.*`, and TensorBoard.
+
 Then run inference with a RandLA-Net checkpoint:
 
 ```bash
@@ -123,3 +125,19 @@ python scripts/run_point_model_inference.py \
 ```
 
 The output includes `assigned_labels`, so it can be passed directly to `visualize_projection.py` or `compare_projection.py`.
+RandLA-Net expects at least 1024 points after loading; real scans should comfortably exceed this.
+
+To verify dependencies:
+
+```bash
+python scripts/run_point_model_inference.py --check-dependencies
+```
+
+To use Open3D's pretrained SemanticKITTI checkpoint:
+
+```bash
+python scripts/run_point_model_inference.py \
+  --points data/raw/pointclouds/scan.npy \
+  --download-semantic-kitti-checkpoint \
+  --output outputs/model_predictions/scan_randlanet.npz
+```
