@@ -34,6 +34,7 @@ joint-seg-classify-projection = "joint_segmentation.cli.classify_projected_point
 joint-seg-evaluate = "joint_segmentation.cli.evaluate_segmentation:main"
 joint-seg-fuse-joint = "joint_segmentation.cli.fuse_joint_segmentation:main"
 joint-seg-point-infer = "joint_segmentation.cli.run_point_model_inference:main"
+joint-seg-run-pipeline = "joint_segmentation.cli.run_pipeline:main"
 joint-seg-project-iphone = "joint_segmentation.cli.project_iphone_lidar:main"
 joint-seg-project-photo = "joint_segmentation.cli.project_relative_photo:main"
 joint-seg-compare-projection = "joint_segmentation.cli.compare_projection:main"

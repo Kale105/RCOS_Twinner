@@ -155,6 +155,22 @@ python scripts/evaluate_segmentation.py \
 
 The evaluator reports point accuracy, mean IoU, and per-class IoU/precision/recall. It works with projection, point-model, or fused joint `.npz` outputs.
 
+## End-to-End Pipeline
+
+Run projection, point-model inference, fusion, optional evaluation, and optional visualization from one config:
+
+```bash
+python scripts/run_pipeline.py --config configs/pipeline.example.yaml
+```
+
+For quick smoke tests without RandLA-Net, set:
+
+```yaml
+point_model:
+  run: false
+  fallback_label: -1
+```
+
 To verify dependencies:
 
 ```bash
