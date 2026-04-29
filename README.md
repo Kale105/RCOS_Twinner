@@ -127,6 +127,23 @@ python scripts/run_point_model_inference.py \
 The output includes `assigned_labels`, so it can be passed directly to `visualize_projection.py` or `compare_projection.py`.
 RandLA-Net expects at least 1024 points after loading; real scans should comfortably exceed this.
 
+## Joint Segmentation Fusion
+
+Fuse point-model predictions with camera-projected image labels:
+
+```bash
+python scripts/fuse_joint_segmentation.py \
+  --points data/raw/pointclouds/scan.npy \
+  --point-prediction outputs/model_predictions/scan_randlanet.npz \
+  --image-projection outputs/projections/photo_projected_labels.npz \
+  --point-weight 0.6 \
+  --image-weight 0.4 \
+  --output outputs/joint/scan_joint_labels.npz \
+  --summary outputs/joint/scan_joint_summary.json
+```
+
+If both inputs include per-class `class_scores`, fusion happens at score level. Otherwise it falls back to weighted hard-label selection.
+
 To verify dependencies:
 
 ```bash
