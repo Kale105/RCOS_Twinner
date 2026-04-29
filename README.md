@@ -144,6 +144,17 @@ python scripts/fuse_joint_segmentation.py \
 
 If both inputs include per-class `class_scores`, fusion happens at score level. Otherwise it falls back to weighted hard-label selection.
 
+Evaluate predicted labels against ground truth labels:
+
+```bash
+python scripts/evaluate_segmentation.py \
+  --prediction outputs/joint/scan_joint_labels.npz \
+  --ground-truth data/raw/labels/scan_point_labels.npy \
+  --output outputs/joint/scan_joint_eval.json
+```
+
+The evaluator reports point accuracy, mean IoU, and per-class IoU/precision/recall. It works with projection, point-model, or fused joint `.npz` outputs.
+
 To verify dependencies:
 
 ```bash

@@ -31,6 +31,7 @@ models = [
 joint-seg-train = "joint_segmentation.cli.train:main"
 joint-seg-infer = "joint_segmentation.cli.infer:main"
 joint-seg-classify-projection = "joint_segmentation.cli.classify_projected_pointcloud:main"
+joint-seg-evaluate = "joint_segmentation.cli.evaluate_segmentation:main"
 joint-seg-fuse-joint = "joint_segmentation.cli.fuse_joint_segmentation:main"
 joint-seg-point-infer = "joint_segmentation.cli.run_point_model_inference:main"
 joint-seg-project-iphone = "joint_segmentation.cli.project_iphone_lidar:main"
